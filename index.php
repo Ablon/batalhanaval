@@ -2,15 +2,16 @@
 include('Jogo.php');
 
 $jogo = new Jogo();
+$jogo->start();
 $jogo->geraTabuleiro();
-$jogo->colocaNavio('submarino');
-$jogo->colocaNavio('porta-aviões');
-$jogo->colocaNavio('encouraçado');
+$jogo->colocaNavios();
 
 if(isset($_POST['coordHorizontal'])){
-    $jogo->start();
-    $jogo->ataca($_POST['coordHorizontal'],$_POST['coordVertical']);
+    
+    $jogo->ataca($jogo->coord_in_numero($_POST['coordVertical']), $_POST['coordHorizontal']); // inverter funciona, são sei o porquê?!?!?!?
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -26,17 +27,18 @@ if(isset($_POST['coordHorizontal'])){
             }
         </style>
         
+        <?php if($jogo->debug){ ?>
         <h2> Tabuleiro de Debug</h2>
         <table border="1">
-            <?php for($h =1; $h <= 10;$h++){ ?>
+            <?php for($h =1; $h <= $jogo->num_horizontal;$h++){ ?>
             <tr>
-            <?php for($v = 1; $v <= 10; $v++){ ?>
+            <?php for($v = 1; $v <= $jogo->num_vertical; $v++){ ?>
             <td><?= $jogo->tabuleiro[$h][$v] ?></td>
             <?php } ?>
             </tr>
             <?php } ?>
         </table>
-        
+        <?php } ?>
         
         
         <h1>Jogada: </h1>
@@ -46,7 +48,7 @@ if(isset($_POST['coordHorizontal'])){
             <input type="number" name="coordHorizontal">
           
             <label for="coordVertical">Coordenada Vertical: </label>
-            <input type="number" name="coordVertical">
+            <input type="text" name="coordVertical">
             
             
             <input type="submit" value="ATACAR!!">
@@ -54,9 +56,15 @@ if(isset($_POST['coordHorizontal'])){
         
         <h2> Tabuleiro Vísivel</h2>
         <table border="1">
-            <?php for($h =1; $h <= 10;$h++){ ?>
-            <tr>
-            <?php for($v = 1; $v <= 10; $v++){ ?>
+            
+            <?php for($i =0; $i <= $jogo->num_horizontal;$i++){ ?>    
+            <td bgcolor='red'><?php echo ($i == 0 ? '' : $i) ?></td>
+            <?php } ?>
+
+            <?php for($h =1; $h <= $jogo->num_horizontal;$h++){ ?>
+            <tr><td bgcolor='yellow'><?= $jogo->numero_in_coord($h) ?></td>
+            <?php for($v = 1; $v <= $jogo->num_vertical; $v++){ ?>
+
             <td><?= $jogo->tabuleiroVisivel[$h][$v] ?></td>
             <?php } ?>
             </tr>
