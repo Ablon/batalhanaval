@@ -1,23 +1,3 @@
-<?php
-define("DEBUG", false);
-include('Conexao.php');
-include('Jogo.php');
-
-$jogo = new Jogo();
-$jogo->start();
-$jogo->geraTabuleiro();
-$jogo->colocaNavios();
-
-if (isset($_POST['coordenadas'])) {
-    $string = str_split($_POST['coordenadas']);
-
-    $vertical = $jogo->coord_in_numero($string[0]); 
-    $horizontal = $string[1] . @$string[2]; // bypass erro, numeros com dois digitos
-
-    $jogo->ataca($vertical, $horizontal); // inverter funciona, são sei o porquê?!?!?!?
-}
-?>
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -25,48 +5,32 @@ if (isset($_POST['coordenadas'])) {
         <title>Batalha Naval - BloodStorm</title>
     </head>
     <body>
-        <style>
-            td { padding: 10px }
-        </style>
+        <h4>Bem vindo ao # Projeto Batalha Naval #</h4>
+<ul>
+Grupo:
+<li>Alice Mantovani</li>
+<li>Eduardo Augusto Ramos</li>
+<li>Felipe Pereira</li>
+<li>Filipe Giannotto</li>
+<li>Lais Vitoria</li>
+</ul>
 
-        <?php if (DEBUG) { ?>
-            <h2> Tabuleiro de Debug</h2>
-            <table border="1">
-                <?php for ($h = 1; $h <= $jogo->num_horizontal; $h++) { ?>
-                    <tr>
-                        <?php for ($v = 1; $v <= $jogo->num_vertical; $v++) { ?>
-                            <td><?= $jogo->tabuleiro[$h][$v] ?></td>
-                        <?php } ?>
-                    </tr>
-                <?php } ?>
-            </table>
-        <?php } ?>
+<h4>Regras:</h4>
+<ul>
+<li>- Cada jogador tem o direito de posicionar 4 navios:</li>
+<li>	1 porta-aviões (5 quadrados)</li>
+<li>	2 encouraçados (3 quadrados)</li>
+<li>	1 submarino (2 quadrados)</li>
+<li>- Tabuleiro com dimensão 10x10 (1-10 horizontal) (A-J na vertical)</li>
+<li>- 2 jogadores</li>
+</ul>
 
+	<form method="POST" action="campo.php">
+		<input type="hidden" name="initial">
+		<label for="nome">Nome do Jogador:</label>
+		<input type="text" name="nome" placeholder="Nome">
 
-        <h1>Jogada: </h1>
-
-        <form method="POST">
-            <label for="coordenadas">Coordenada:</label>
-            <input type="text" maxlength="3" placeholder="A1" name="coordenadas">
-
-            <input type="submit" value="ATACAR!!">
-        </form>    
-
-        <h2> Tabuleiro Vísivel</h2>
-        <table border="1">
-
-            <?php for ($i = 0; $i <= $jogo->num_horizontal; $i++) { ?>    
-                <td bgcolor='red'><?php echo ($i == 0 ? '' : $i) ?></td>
-            <?php } ?>
-
-            <?php for ($h = 1; $h <= $jogo->num_horizontal; $h++) { ?>
-                <tr><td bgcolor='yellow'><?= $jogo->numero_in_coord($h) ?></td>
-                    <?php for ($v = 1; $v <= $jogo->num_vertical; $v++) { ?>
-
-                        <td><?= $jogo->tabuleiroVisivel[$h][$v] ?></td>
-                    <?php } ?>
-                </tr>
-            <?php } ?>
-        </table>
+		<input type="submit" value="GERAR BATALHA!">
+	</form>	
     </body>
 </html>

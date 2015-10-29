@@ -1,7 +1,9 @@
 <?php
+
+include('Jogador.php');
+
 class Jogo {
 
-    public $jogador_id = 1;
     public $jogo_id = 1;
     public $tabuleiro = array();
     public $tabuleiroVisivel = array();
@@ -10,24 +12,20 @@ class Jogo {
     public $num_vertical = 10;
     public $pontuacao_maxima = 9; // melhorar isso daqui
 
-    public function start() {
+    public function start($nome) {
         $this->coordenadas = range('A', 'Z');
         
         $jogo = Database::select("SELECT id FROM jogo WHERE id = $this->jogo_id;"); // checa se o jogo existe, senão cria um
         if ($jogo->rowCount() == 0) {
-            $novo = Database::insert("INSERT INTO jogo VALUES ($this->jogo_id, " . date("Y-m-d") . ");");
+			$novo = Database::insert('jogador', array('id' => $this->jogo_id, 'data' => date("Y-m-d")));
             if ($novo == false && DEBUG) {
                 exit("ERRO NA CRIAÇÃO DE UM NOVO JOGO!");
             }
         }
         
-        $jogador = Database::select("SELECT id FROM jogador WHERE id = $this->jogo_id;"); // checa se o jogador existe, senão cria um
-        if ($jogador->rowCount() == 0) {
-            $novo = Conexao::insert("INSERT INTO jogador VALUES ($this->jogador_id, 'EDUARDO TESTE', 0);");
-            if ($novo == false && DEBUG) {
-                exit("ERRO NA CRIAÇÃO DE UM NOVO JOGADOR!");
-            }
-        }
+        $this->jogador = new Jogador($nome);
+        $this->jogador_id = $this->jogador->jogador_id;
+
     }
 
     public function geraTabuleiro() {
