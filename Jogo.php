@@ -14,18 +14,17 @@ class Jogo {
 
     public function start($nome) {
         $this->coordenadas = range('A', 'Z');
-        
+
         $jogo = Database::select("SELECT id FROM jogo WHERE id = $this->jogo_id;"); // checa se o jogo existe, senão cria um
         if ($jogo->rowCount() == 0) {
-			$novo = Database::insert('jogador', array('id' => $this->jogo_id, 'data' => date("Y-m-d")));
+            $novo = Database::insert('jogador', array('id' => $this->jogo_id, 'data' => date("Y-m-d")));
             if ($novo == false && DEBUG) {
                 exit("ERRO NA CRIAÇÃO DE UM NOVO JOGO!");
             }
         }
-        
+
         $this->jogador = new Jogador($nome);
         $this->jogador_id = $this->jogador->jogador_id;
-
     }
 
     public function geraTabuleiro() {
@@ -39,7 +38,7 @@ class Jogo {
         }
 
         // se jogo já existir, preencher com X's o tabuleiro
-        $result = Database::select("SELECT * FROM jogadas WHERE jogo_id = $this->jogo_id;");
+        $result = Database::select("SELECT * FROM jogadas WHERE jogo_id = $this->jogo_id AND jogador_id = $this->jogador_id");
         if ($result->rowCount() > 0) {
             $rows = $result->fetchAll(PDO::FETCH_ASSOC);
             foreach ($rows as $row) {
@@ -65,9 +64,9 @@ class Jogo {
                 while ($controle == false) {
                     $horizontal = rand(1, $this->num_horizontal);
                     $vertical = rand(1, $this->num_vertical);
-                
-                    if (isset($this->tabuleiro[$horizontal][$vertical]) && 
-                        empty($this->tabuleiro[$horizontal][$vertical])) {
+
+                    if (isset($this->tabuleiro[$horizontal][$vertical]) &&
+                            empty($this->tabuleiro[$horizontal][$vertical])) {
                         $this->tabuleiro[$horizontal][$vertical] = "SUB_part_1";
                         $controle = true;
                     }
@@ -77,8 +76,6 @@ class Jogo {
                 break;
 
             case 'porta-aviões':
-
-                // LÓGICA MAIS MALUCA QUE CONSEGUI INVENTAR, NÃO SEI COMO ESSA MERDA FUNCIONA, MAS FUNCIONA!
                 while ($controle == false) {
                     $horizontal = rand(1, $this->num_horizontal);
                     $vertical = rand(1, $this->num_vertical);
@@ -150,7 +147,7 @@ class Jogo {
 
             // não cria várias conexões com o banco de dados, ou senão vai sobrecarregar ele!
             $sql .= implode(', ', $queries) . "; ";
-            $stmt = Conexao::getConexao()->prepare($sql);
+            $stmt = Connection::getConnection()->prepare($sql);
             $stmt->execute();
         } else {
             // pega os navios
@@ -187,12 +184,12 @@ class Jogo {
     }
 
     public function guardaJogada($horizontal, $vertical, $navio = '') {
-        $stmt = Database::insert("INSERT INTO `jogadas` (`jogador_id`, `jogo_id`, `coordHorizontal`, `coordVertical`, `navio`) VALUES ($this->jogador_id, $this->jogo_id, $horizontal, $vertical, '$navio');");
+        $stmt = Database::insert('jogadas', array('jogador_id' => $this->jogador_id, 'jogo_id' => $this->jogo_id, 'coordHorizontal' => $horizontal, 'coordVertical' => $vertical, 'navio' => $navio));
     }
 
     public function limpaJogo() {
         $sql = "DELETE FROM `jogadas` WHERE jogo_id = $this->jogo_id;";
-        $stmt = Conexao::getConexao()->prepare($sql)->execute();
+        $stmt = Connection::getConnection()->prepare($sql)->execute();
     }
 
     public function numero_in_coord($numero) {
@@ -206,10 +203,10 @@ class Jogo {
     public function pontuar() {
 
         $sql = "UPDATE jogador SET pontuacao = pontuacao + 1 WHERE id = $this->jogador_id;";
-        $stmt = Conexao::getConexao()->prepare($sql)->execute();
+        $stmt = Connection::getConnection()->prepare($sql)->execute();
 
 
-        $stmt = Conexao::getConexao()->prepare("SELECT pontuacao FROM jogador WHERE id = $this->jogador_id");
+        $stmt = Connection::getConnection()->prepare("SELECT pontuacao FROM jogador WHERE id = $this->jogador_id");
         $stmt->execute();
         if ($stmt->rowCount() >= 1) {
 
@@ -222,7 +219,7 @@ class Jogo {
 
                 // reseta pontuacao
                 $sql = "UPDATE jogador SET pontuacao = 0 WHERE id = $this->jogador_id;";
-                $stmt = Conexao::getConexao()->prepare($sql)->execute();
+                $stmt = Connection::getConnection()->prepare($sql)->execute();
                 exit;
             }
         }

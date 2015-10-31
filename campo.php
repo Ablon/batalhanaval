@@ -1,18 +1,12 @@
 <?php
+session_start();
 define("DEBUG", false);
 include('Model/database.php');
 include('Jogo.php');
 
-if (!isset($_POST['initial'])){
-    exit("Nenhum jogo disponivel.");
-}
-
-if(!isset($_POST['nome'])){
-    exit('erro no nome');
-}
 
 $jogo = new Jogo();
-$jogo->start($_POST['nome']);
+$jogo->start("DASKDABS");
 $jogo->geraTabuleiro();
 $jogo->colocaNavios();
 
@@ -24,12 +18,15 @@ if (isset($_POST['coordenadas'])) {
 
     $jogo->ataca($vertical, $horizontal); // inverter funciona, são sei o porquê?!?!?!?
 }
+
+
 ?>
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
+        <meta http-equiv="refresh" content="5">
         <title>Batalha Naval - BloodStorm</title>
     </head>
     <body>
@@ -56,7 +53,7 @@ if (isset($_POST['coordenadas'])) {
 
         <form method="POST">
             <label for="coordenadas">Coordenada:</label>
-            <input type="text" maxlength="3" placeholder="A1" name="coordenadas">
+            <input type="text" maxlength="3" placeholder="A1" name="coordenadas"> 
 
             <input type="submit" value="ATACAR!!">
         </form>    
